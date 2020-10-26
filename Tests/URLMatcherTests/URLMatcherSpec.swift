@@ -39,11 +39,19 @@ final class URLMatcherSpec: QuickSpec {
     }
 
     it("returns a result for totally matching url") {
-      let candidates = ["myapp://hello"]
-      let result = matcher.match("myapp://hello", from: candidates)
+      let candidates = ["myapp://hello/<name>", "myapp://hello/world"]
+      let result = matcher.match("myapp://hello/world", from: candidates)
       expect(result).notTo(beNil())
-      expect(result?.pattern) == "myapp://hello"
+      expect(result?.pattern) == "myapp://hello/world"
       expect(result?.values.count) == 0
+    }
+
+    it("returns a result for the longest matching url") {
+      let candidates = ["myapp://<path:path>", "myapp://hello/<name>"]
+      let result = matcher.match("myapp://hello/world", from: candidates)
+      expect(result).notTo(beNil())
+      expect(result?.pattern) == "myapp://hello/<name>"
+      expect(result?.values.count) == 1
     }
 
     it("returns a result with an url value for matching url") {
@@ -136,6 +144,32 @@ final class URLMatcherSpec: QuickSpec {
       expect(result).notTo(beNil())
       expect(result?.pattern) == "https://<path:url>"
       expect(result?.values["url"] as? String) == "google.com/search"
+    }
+
+    it("returns nil when there's no candidates (issues-109)") {
+        let candidates = ["/anything/<path:url>"]
+        let result = matcher.match("", from: candidates)
+        expect(result).to(beNil())
+    }
+
+    it("returns nil when there's no candidates (issues-109)") {
+        let candidates = ["http://host/anything/<path:url>"]
+        let result = matcher.match("http://host/anything", from: candidates)
+        expect(result).to(beNil())
+    }
+
+    it("returns same candidate (issues-109)") {
+        let candidates1 = ["http://host/anything/<path:url>", "http://host/anything"]
+        let result1 = matcher.match("http://host/anything", from: candidates1)
+        let candidates2 = ["http://host/anything", "http://host/anything/<path:url>"]
+        let result2 = matcher.match("http://host/anything", from: candidates2)
+        expect(result1?.pattern).to(equal(result2?.pattern))
+    }
+
+    it("returns nil when there is anotehr url in the path (#123)") {
+      let candidates = ["myapp://browser/<url>"]
+      let result = matcher.match("myapp://browser/http://google.fr", from: candidates)
+      expect(result).to(beNil())
     }
   }
 }

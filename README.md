@@ -1,8 +1,8 @@
 # URLNavigator
 
-![Swift](https://img.shields.io/badge/Swift-4.2-orange.svg)
+![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg)
 [![CocoaPods](http://img.shields.io/cocoapods/v/URLNavigator.svg)](https://cocoapods.org/pods/URLNavigator)
-[![Build Status](https://travis-ci.org/devxoul/URLNavigator.svg?branch=master)](https://travis-ci.org/devxoul/URLNavigator)
+[![Build Status](https://github.com/devxoul/URLNavigator/workflows/CI/badge.svg)](https://github.com/devxoul/URLNavigator/actions)
 [![CodeCov](https://img.shields.io/codecov/c/github/devxoul/URLNavigator.svg)](https://codecov.io/gh/devxoul/URLNavigator)
 
 ⛵️ URLNavigator provides an elegant way to navigate through view controllers by URLs. URL patterns can be mapped by using `URLNavigator.register(_:_:)` function.
@@ -29,7 +29,7 @@ But it doesn't match with:
 
 #### 2. Mapping View Controllers and URL Open Handlers
 
-URLNavigator allows to map view controllers ans URL open handlers with URL patterns. Here's an example of mapping URL patterns with view controllers and a closure. Each closures has three parameters: `url`, `values` and `context`.
+URLNavigator allows to map view controllers and URL open handlers with URL patterns. Here's an example of mapping URL patterns with view controllers and a closure. Each closures has three parameters: `url`, `values` and `context`.
 
 * `url` is an URL that is passed from `push()` and `present()`.
 * `values` is a dictionary that contains URL placeholder keys and values.
@@ -110,8 +110,8 @@ You can find an example app [here](https://github.com/devxoul/URLNavigator/tree/
 2. Register to an IoC container:
 
     ```swift
-    container.register(NavigatorType.self) { _ in Navigator() } // Swinject
-    let navigator = container.resolve(NavigatorType.self)!
+    container.register(NavigatorProtocol.self) { _ in Navigator() } // Swinject
+    let navigator = container.resolve(NavigatorProtocol.self)!
     ```
 
 3. Inject dependency from a composition root.
@@ -123,7 +123,7 @@ I'd prefer using separated URL map file.
 
 ```swift
 struct URLNavigationMap {
-  static func initialize(navigator: NavigatorType) {
+  static func initialize(navigator: NavigatorProtocol) {
     navigator.register("myapp://user/<int:id>") { ... }
     navigator.register("myapp://post/<title>") { ... }
     navigator.handle("myapp://alert") { ... }
